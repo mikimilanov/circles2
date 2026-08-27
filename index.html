@@ -6,105 +6,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#dcdcdc" />
-  <title>Target Task - Eye Height Calibration</title>
+  <title>Target Task - Eye + Arm Reach Calibration</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #dcdcdc;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-      overscroll-behavior: none;
-      touch-action: manipulation;
-    }
-    body { position: fixed; inset: 0; }
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      cursor: pointer;
-    }
-    .toolbar-trigger {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: max(28px, env(safe-area-inset-top));
-      z-index: 30;
-      background: transparent;
-    }
-    .toolbar {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translate(-50%, -110%);
-      transition: transform 180ms ease;
-      background: rgba(255,255,255,0.97);
-      border: 1px solid #d0d0d0;
-      border-top: none;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-      padding: calc(10px + env(safe-area-inset-top)) 12px 10px 12px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      z-index: 40;
-      direction: rtl;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .toolbar.visible { transform: translate(-50%, 0); }
-    .toolbar button {
-      border: 1px solid #cfcfcf;
-      background: #fff;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .toolbar button:hover { background: #f5f5f5; }
-    .toolbar .meta {
-      font-size: 12px;
-      color: #666;
-      margin-inline-start: 8px;
-      white-space: nowrap;
-    }
-    .calibration-panel {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 50;
-      direction: rtl;
-      background: rgba(255,255,255,0.96);
-      border: 1px solid #ccc;
-      border-radius: 14px;
-      padding: 12px 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.14);
-      max-width: 360px;
-      font-size: 14px;
-      color: #333;
-    }
-    .calibration-panel button {
-      border: 1px solid #bbb;
-      border-radius: 10px;
-      background: #fff;
-      padding: 8px 12px;
-      margin-top: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .calibration-panel button.primary {
-      background: #2e9f48;
-      color: #fff;
-      border-color: #2e9f48;
-      font-weight: bold;
-    }
-    .calibration-panel .small {
-      color: #666;
-      font-size: 12px;
-      line-height: 1.4;
-    }
+    html, body { margin:0; padding:0; width:100%; height:100%; background:#dcdcdc; font-family:Arial,sans-serif; overflow:hidden; overscroll-behavior:none; touch-action:manipulation; }
+    body { position:fixed; inset:0; }
+    canvas { display:block; width:100vw; height:100vh; cursor:pointer; }
+    .toolbar-trigger { position:fixed; top:0; left:0; right:0; height:max(28px, env(safe-area-inset-top)); z-index:30; background:transparent; }
+    .toolbar { position:fixed; top:0; left:50%; transform:translate(-50%,-110%); transition:transform 180ms ease; background:rgba(255,255,255,.97); border:1px solid #d0d0d0; border-top:none; border-bottom-left-radius:12px; border-bottom-right-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.12); padding:calc(10px + env(safe-area-inset-top)) 12px 10px; display:flex; gap:8px; align-items:center; z-index:40; direction:rtl; flex-wrap:wrap; justify-content:center; }
+    .toolbar.visible { transform:translate(-50%,0); }
+    .toolbar button { border:1px solid #cfcfcf; background:#fff; border-radius:10px; padding:8px 12px; font-size:13px; cursor:pointer; }
+    .toolbar button:hover { background:#f5f5f5; }
+    .toolbar .meta { font-size:12px; color:#666; margin-inline-start:8px; white-space:nowrap; }
+    .calibration-panel { position:fixed; right:18px; bottom:18px; z-index:50; direction:rtl; background:rgba(255,255,255,.97); border:1px solid #ccc; border-radius:14px; padding:14px 16px; box-shadow:0 8px 24px rgba(0,0,0,.14); max-width:430px; font-size:14px; color:#333; line-height:1.45; }
+    .calibration-panel button { border:1px solid #bbb; border-radius:10px; background:#fff; padding:8px 12px; margin-top:8px; cursor:pointer; font-size:14px; }
+    .calibration-panel button.primary { background:#2e9f48; color:#fff; border-color:#2e9f48; font-weight:bold; }
+    .calibration-panel .small { color:#666; font-size:12px; line-height:1.4; margin-top:4px; }
+    .calibration-group { margin-top:10px; padding-top:8px; border-top:1px solid #e5e5e5; }
+    .calibration-group b { display:block; margin-bottom:2px; }
   </style>
 </head>
 <body>
@@ -116,17 +34,32 @@
     <button id="csvBtn">ייצוא CSV</button>
     <button id="clearBtn">איפוס</button>
     <button id="recalibrateBtn">כיול מחדש</button>
-    <span id="meta" class="meta">כיול</span>
+    <span id="meta" class="meta">כיול גובה</span>
   </div>
 
   <div id="calibrationPanel" class="calibration-panel">
-    <b>שלב כיול גובה עיניים</b><br>
-    הזיזו את הקו בעזרת החצים ↑ ↓ עד שהוא נמצא בגובה העיניים של הנבדק.
-    <div class="small">אפשר גם להשתמש בכפתורים למטה. לאחר מכן לחצו Start.</div>
-    <button id="moveUpBtn">העלה קו ↑</button>
-    <button id="moveDownBtn">הורד קו ↓</button>
-    <br>
-    <button id="startBtn" class="primary">Start</button>
+    <div id="eyeCalibrationControls">
+      <b>שלב 1 מתוך 2 – כיול גובה עיניים</b><br>
+      הזיזו את הקו האופקי בעזרת החצים ↑ ↓ עד שהוא נמצא בגובה העיניים של הנבדק.
+      <div class="small">אפשר להשתמש גם בכפתורים. לאחר ההתאמה עברו לכיול טווח הידיים.</div>
+      <button id="moveUpBtn">העלה קו ↑</button>
+      <button id="moveDownBtn">הורד קו ↓</button><br>
+      <button id="toArmCalibrationBtn" class="primary">המשך לכיול טווח הידיים</button>
+    </div>
+
+    <div id="armCalibrationControls" style="display:none;">
+      <b>שלב 2 מתוך 2 – כיול טווח הידיים</b><br>
+      הנבדק עומד במרכז ופורש את שתי הזרועות לצדדים.
+      <div id="armInstruction" class="small" style="font-size:14px;color:#333;margin-top:8px;">
+        מתחילים בקו הימני. הזיזו אותו עם החצים ← → עד לקצה טווח ההגעה הנוח, ללא צעד הצידה. לחצו Enter לאישור.
+      </div>
+      <div class="calibration-group">
+        <b>שליטה גם באמצעות כפתורים</b>
+        <button id="activeLeftBtn">← הזז שמאלה</button>
+        <button id="activeRightBtn">הזז ימינה →</button>
+      </div>
+      <button id="confirmArmBtn" class="primary">אישור ימין ומעבר לשמאל (Enter)</button>
+    </div>
   </div>
 
   <canvas id="c"></canvas>
@@ -139,29 +72,12 @@
     const meta = document.getElementById('meta');
     const toggleHomeBtn = document.getElementById('toggleHomeBtn');
     const calibrationPanel = document.getElementById('calibrationPanel');
+    const eyeCalibrationControls = document.getElementById('eyeCalibrationControls');
+    const armCalibrationControls = document.getElementById('armCalibrationControls');
 
     const ANGLES = [-32, -16, -8, -4, 0, 4, 8, 16, 32];
-
-    // Fixed counts adjusted to sum exactly to 54 while staying close to the requested weights:
-    // ±32 = 2.782%, ±16 = 7.975%, ±8 = 13.214%, ±4 = 16.264%, 0 = 19.473%
-    const ANGLE_TARGET_COUNTS = {
-      "-32": 2,
-      "-16": 4,
-      "-8": 7,
-      "-4": 9,
-      "0": 10,
-      "4": 9,
-      "8": 7,
-      "16": 4,
-      "32": 2
-    };
-
-    // eye = 40%, chest = 60%, rounded to 54 trials
-    const HEIGHT_TARGET_COUNTS = {
-      eye: 22,
-      chest: 32
-    };
-
+    const ANGLE_TARGET_COUNTS = { "-32":2, "-16":4, "-8":7, "-4":9, "0":10, "4":9, "8":7, "16":4, "32":2 };
+    const HEIGHT_TARGET_COUNTS = { eye:22, chest:32 };
     const TOTAL_TRIALS = 54;
 
     let logs = [];
@@ -171,436 +87,311 @@
     let targetsList = [];
     let currentIndex = 0;
 
-    // Calibration state
-    let isCalibrating = true;
-    let eyeHeightY = null;        // pixel y-coordinate of participant eye-height
-    let calibrationStepPx = 8;    // arrow step
+    let calibrationStage = 'eye';
+    let eyeHeightY = null;
+    const calibrationStepPx = 8;
+    let leftReachX = null;
+    let rightReachX = null;
+    const armCalibrationStepPx = 10;
 
     function updateMeta() {
-      if (isCalibrating) {
-        meta.textContent = 'כיול';
-      } else {
-        meta.textContent = `${logs.length} / ${TOTAL_TRIALS}`;
-      }
+      if (calibrationStage === 'eye') meta.textContent = 'כיול גובה';
+      else if (calibrationStage === 'arms') meta.textContent = 'כיול טווח ידיים';
+      else meta.textContent = `${logs.length} / ${TOTAL_TRIALS}`;
     }
 
-    function showToolbar() {
-      toolbar.classList.add('visible');
-      toolbar.setAttribute('aria-hidden', 'false');
-    }
-
-    function hideToolbar() {
-      toolbar.classList.remove('visible');
-      toolbar.setAttribute('aria-hidden', 'true');
-    }
-
+    function showToolbar(){ toolbar.classList.add('visible'); toolbar.setAttribute('aria-hidden','false'); }
+    function hideToolbar(){ toolbar.classList.remove('visible'); toolbar.setAttribute('aria-hidden','true'); }
     toolbarTrigger.addEventListener('mouseenter', showToolbar);
     toolbar.addEventListener('mouseenter', showToolbar);
-    toolbarTrigger.addEventListener('mouseleave', () => setTimeout(checkToolbarHide, 60));
-    toolbar.addEventListener('mouseleave', () => setTimeout(checkToolbarHide, 60));
+    toolbarTrigger.addEventListener('mouseleave',()=>setTimeout(checkToolbarHide,60));
+    toolbar.addEventListener('mouseleave',()=>setTimeout(checkToolbarHide,60));
+    document.addEventListener('mousemove',e=>{ if(e.clientY<=18) showToolbar(); });
+    function checkToolbarHide(){ if(!toolbar.matches(':hover') && !toolbarTrigger.matches(':hover')) hideToolbar(); }
 
-    document.addEventListener('mousemove', (e) => {
-      if (e.clientY <= 18) showToolbar();
-    });
+    function getViewportWidth(){ return window.visualViewport ? window.visualViewport.width : window.innerWidth; }
+    function getViewportHeight(){ return window.visualViewport ? window.visualViewport.height : window.innerHeight; }
 
-    function checkToolbarHide() {
-      if (!toolbar.matches(':hover') && !toolbarTrigger.matches(':hover')) hideToolbar();
+    function getBoardBase(){
+      const w=getViewportWidth(), h=getViewportHeight();
+      return { x:w*.06, y:h*.08, width:w*.88, height:h*.84, radius:20 };
     }
 
-    function getViewportWidth() {
-      return window.visualViewport ? window.visualViewport.width : window.innerWidth;
-    }
+    function resizeCanvas(){
+      const vw=getViewportWidth(), vh=getViewportHeight(), dpr=window.devicePixelRatio||1;
+      canvas.width=Math.floor(vw*dpr); canvas.height=Math.floor(vh*dpr);
+      canvas.style.width=vw+'px'; canvas.style.height=vh+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
 
-    function getViewportHeight() {
-      return window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    }
+      const board=getBoardBase();
+      if(eyeHeightY===null) eyeHeightY=vh*.42;
+      else eyeHeightY=Math.min(Math.max(eyeHeightY,board.y+30),board.y+board.height-30);
 
-    function resizeCanvas() {
-      const vw = getViewportWidth();
-      const vh = getViewportHeight();
-      const dpr = window.devicePixelRatio || 1;
-
-      canvas.width = Math.floor(vw * dpr);
-      canvas.height = Math.floor(vh * dpr);
-      canvas.style.width = vw + 'px';
-      canvas.style.height = vh + 'px';
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      if (eyeHeightY === null) {
-        eyeHeightY = vh * 0.42; // default starting calibration line
-      } else {
-        eyeHeightY = Math.min(Math.max(eyeHeightY, vh * 0.08), vh * 0.9);
+      const centerX=board.x+board.width/2;
+      if(leftReachX===null || rightReachX===null){
+        leftReachX=centerX-board.width*.34;
+        rightReachX=centerX+board.width*.34;
       }
-
+      clampArmCalibration();
       drawCurrent();
     }
 
-    function shuffle(array) {
-      const a = [...array];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
+    function shuffle(array){
+      const a=[...array];
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
       return a;
     }
 
-    function generateTargets() {
-      const targets = [];
-
-      for (const [angle, count] of Object.entries(ANGLE_TARGET_COUNTS)) {
-        for (let i = 0; i < count; i++) {
-          targets.push({ angle: Number(angle) });
-        }
+    function generateTargets(){
+      const targets=[];
+      for(const [angle,count] of Object.entries(ANGLE_TARGET_COUNTS)){
+        for(let i=0;i<count;i++) targets.push({angle:Number(angle)});
       }
-
-      const heights = [
-        ...Array(HEIGHT_TARGET_COUNTS.eye).fill('eye'),
-        ...Array(HEIGHT_TARGET_COUNTS.chest).fill('chest')
-      ];
-
-      const shuffledHeights = shuffle(heights);
-
-      for (let i = 0; i < targets.length; i++) {
-        targets[i].height = shuffledHeights[i];
-      }
-
+      const heights=[...Array(HEIGHT_TARGET_COUNTS.eye).fill('eye'), ...Array(HEIGHT_TARGET_COUNTS.chest).fill('chest')];
+      const shuffledHeights=shuffle(heights);
+      for(let i=0;i<targets.length;i++) targets[i].height=shuffledHeights[i];
       return shuffle(targets);
     }
 
-    function getBoard() {
-      const w = getViewportWidth();
-      const h = getViewportHeight();
-
-      const board = {
-        x: w * 0.06,
-        y: h * 0.08,
-        width: w * 0.88,
-        height: h * 0.84,
-        radius: 20
-      };
-
-      // New home position:
-      // x = center of screen/board, y = calibrated participant eye-height.
-      const origin = {
-        x: board.x + board.width / 2,
-        y: eyeHeightY
-      };
-
-      // Two vertical rows are placed ABOVE the calibrated eye-height line,
-      // so the participant/body/hands are less likely to occlude the targets.
-      const availableAbove = Math.max(80, origin.y - board.y);
-      const eyeY = origin.y - availableAbove * 0.72;
-      const chestY = origin.y - availableAbove * 0.42;
-
-      const maxHorizontalPx = (board.width / 2) * 0.86;
-      const pxPerDegree = maxHorizontalPx / 32;
-
-      const targetRadiusPx = Math.max(18, Math.min(board.width, board.height) * 0.022);
-
-      return { board, origin, eyeY, chestY, pxPerDegree, targetRadiusPx };
+    function getBoard(){
+      const board=getBoardBase();
+      const origin={ x:board.x+board.width/2, y:eyeHeightY };
+      const availableAbove=Math.max(80,origin.y-board.y);
+      const eyeY=origin.y-availableAbove*.72;
+      const chestY=origin.y-availableAbove*.42;
+      const targetRadiusPx=Math.max(18,Math.min(board.width,board.height)*.022);
+      return {board,origin,eyeY,chestY,targetRadiusPx};
     }
 
-    function drawBoard(board) {
-      ctx.fillStyle = '#f6f6f6';
-      ctx.strokeStyle = '#d7d7d7';
-      ctx.lineWidth = 2;
-      roundRect(ctx, board.x, board.y, board.width, board.height, board.radius);
-      ctx.fill();
-      ctx.stroke();
+    function clampArmCalibration(){
+      const board=getBoardBase();
+      const centerX=board.x+board.width/2;
+      const minHalfReach=Math.max(80,board.width*.10);
+      const outerPadding=Math.max(20,board.width*.03);
+      leftReachX=Math.min(Math.max(leftReachX,board.x+outerPadding),centerX-minHalfReach);
+      rightReachX=Math.min(Math.max(rightReachX,centerX+minHalfReach),board.x+board.width-outerPadding);
     }
 
-    function drawCalibrationScreen() {
-      const vw = getViewportWidth();
-      const vh = getViewportHeight();
-      const { board } = getBoard();
+    function mapAngleToX(angle,originX){
+      if(angle<0){ const f=Math.abs(angle)/32; return originX-f*(originX-leftReachX); }
+      if(angle>0){ const f=angle/32; return originX+f*(rightReachX-originX); }
+      return originX;
+    }
 
-      ctx.clearRect(0, 0, vw, vh);
-      drawBoard(board);
+    function drawBoard(board){
+      ctx.fillStyle='#f6f6f6'; ctx.strokeStyle='#d7d7d7'; ctx.lineWidth=2;
+      roundRect(ctx,board.x,board.y,board.width,board.height,board.radius); ctx.fill(); ctx.stroke();
+    }
 
-      // Eye-height calibration line
-      ctx.save();
-      ctx.strokeStyle = '#e53935';
-      ctx.lineWidth = 4;
-      ctx.setLineDash([14, 10]);
-      ctx.beginPath();
-      ctx.moveTo(board.x, eyeHeightY);
-      ctx.lineTo(board.x + board.width, eyeHeightY);
-      ctx.stroke();
+    function drawEyeCalibrationScreen(){
+      const vw=getViewportWidth(), vh=getViewportHeight(), {board}=getBoard();
+      ctx.clearRect(0,0,vw,vh); drawBoard(board);
+      ctx.save(); ctx.strokeStyle='#e53935'; ctx.lineWidth=4; ctx.setLineDash([14,10]);
+      ctx.beginPath(); ctx.moveTo(board.x,eyeHeightY); ctx.lineTo(board.x+board.width,eyeHeightY); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(board.x+board.width/2,eyeHeightY,6,0,Math.PI*2); ctx.fillStyle='#9aa0a6'; ctx.fill();
+      ctx.fillStyle='#333'; ctx.font='18px Arial'; ctx.textAlign='center';
+      ctx.fillText('כווננו את הקו לגובה העיניים של הנבדק',vw/2,Math.max(32,board.y-18)); ctx.restore();
+    }
+
+    function drawArmCalibrationScreen(){
+      const vw=getViewportWidth(), vh=getViewportHeight(), {board,origin}=getBoard();
+      clampArmCalibration(); ctx.clearRect(0,0,vw,vh); drawBoard(board); ctx.save();
+      ctx.strokeStyle='#b0b0b0'; ctx.lineWidth=2; ctx.setLineDash([8,8]);
+      ctx.beginPath(); ctx.moveTo(board.x,eyeHeightY); ctx.lineTo(board.x+board.width,eyeHeightY); ctx.stroke();
+      ctx.lineWidth=4; ctx.setLineDash([14,10]);
+
+      ctx.strokeStyle=armCalibrationSide==='left' ? '#e53935' : '#b8b8b8';
+      ctx.beginPath(); ctx.moveTo(leftReachX,board.y); ctx.lineTo(leftReachX,board.y+board.height); ctx.stroke();
+
+      ctx.strokeStyle=armCalibrationSide==='right' ? '#e53935' : '#b8b8b8';
+      ctx.beginPath(); ctx.moveTo(rightReachX,board.y); ctx.lineTo(rightReachX,board.y+board.height); ctx.stroke();
+
       ctx.setLineDash([]);
-
-      // Center/home preview point
-      ctx.beginPath();
-      ctx.arc(board.x + board.width / 2, eyeHeightY, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#9aa0a6';
-      ctx.fill();
-
-      ctx.fillStyle = '#333';
-      ctx.font = '18px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('כווננו את הקו לגובה העיניים של הנבדק', vw / 2, Math.max(32, board.y - 18));
-      ctx.restore();
+      ctx.beginPath(); ctx.arc(origin.x,origin.y,6,0,Math.PI*2); ctx.fillStyle='#9aa0a6'; ctx.fill();
+      ctx.strokeStyle='#2e9f48'; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(leftReachX,eyeHeightY); ctx.lineTo(rightReachX,eyeHeightY); ctx.stroke();
+      ctx.fillStyle='#333'; ctx.font='18px Arial'; ctx.textAlign='center';
+      ctx.fillText('כווננו את הקווים לקצות טווח ההגעה הנוח של שתי הזרועות',vw/2,Math.max(32,board.y-18)); ctx.restore();
     }
 
-    function drawFinishedScreen() {
-      const { board } = getBoard();
-      ctx.clearRect(0, 0, getViewportWidth(), getViewportHeight());
-      drawBoard(board);
-      ctx.fillStyle = '#2f2f2f';
-      ctx.font = '28px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('הניסוי הסתיים', getViewportWidth() / 2, getViewportHeight() / 2 - 10);
-      ctx.font = '18px Arial';
-      ctx.fillStyle = '#666';
-      ctx.fillText(`${TOTAL_TRIALS} ניסיונות הושלמו`, getViewportWidth() / 2, getViewportHeight() / 2 + 24);
+    function drawFinishedScreen(){
+      const {board}=getBoard(); ctx.clearRect(0,0,getViewportWidth(),getViewportHeight()); drawBoard(board);
+      ctx.fillStyle='#2f2f2f'; ctx.font='28px Arial'; ctx.textAlign='center'; ctx.fillText('הניסוי הסתיים',getViewportWidth()/2,getViewportHeight()/2-10);
+      ctx.font='18px Arial'; ctx.fillStyle='#666'; ctx.fillText(`${TOTAL_TRIALS} ניסיונות הושלמו`,getViewportWidth()/2,getViewportHeight()/2+24);
     }
 
-    function drawTarget(target) {
-      if (isCalibrating) {
-        drawCalibrationScreen();
-        return;
-      }
+    function drawTarget(target,preserveShownTime=false){
+      if(calibrationStage==='eye'){ drawEyeCalibrationScreen(); return; }
+      if(calibrationStage==='arms'){ drawArmCalibrationScreen(); return; }
+      if(finished){ drawFinishedScreen(); return; }
 
-      if (finished) {
-        drawFinishedScreen();
-        return;
-      }
+      const {board,origin,eyeY,chestY,targetRadiusPx}=getBoard();
+      ctx.clearRect(0,0,getViewportWidth(),getViewportHeight()); drawBoard(board);
+      const x=mapAngleToX(target.angle,origin.x);
+      const y=target.height==='eye'?eyeY:chestY;
+      ctx.beginPath(); ctx.arc(x,y,targetRadiusPx,0,Math.PI*2); ctx.fillStyle='#2e9f48'; ctx.fill();
+      if(showHome){ ctx.beginPath(); ctx.arc(origin.x,origin.y,5,0,Math.PI*2); ctx.fillStyle='#9aa0a6'; ctx.fill(); }
 
-      const { board, origin, eyeY, chestY, pxPerDegree, targetRadiusPx } = getBoard();
-
-      ctx.clearRect(0, 0, getViewportWidth(), getViewportHeight());
-      drawBoard(board);
-
-      const x = origin.x + target.angle * pxPerDegree;
-      const y = target.height === 'eye' ? eyeY : chestY;
-
-      ctx.beginPath();
-      ctx.arc(x, y, targetRadiusPx, 0, Math.PI * 2);
-      ctx.fillStyle = '#2e9f48';
-      ctx.fill();
-
-      if (showHome) {
-        ctx.beginPath();
-        ctx.arc(origin.x, origin.y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#9aa0a6';
-        ctx.fill();
-      }
-
-      currentTarget = {
-        trial: logs.length + 1,
-        angle: target.angle,
-        height: target.height,
-        calibrationEyeHeightY: Number(eyeHeightY.toFixed(2)),
-        calibrationEyeHeightYPercent: Number((eyeHeightY / getViewportHeight()).toFixed(4)),
-        x: Number(x.toFixed(2)),
-        y: Number(y.toFixed(2)),
-        targetSizePx: Number(targetRadiusPx.toFixed(2)),
-        shownAtISO: new Date().toISOString(),
-        shownAtMs: Date.now(),
-        homeVisible: showHome
+      const prevISO=currentTarget?.shownAtISO, prevMs=currentTarget?.shownAtMs;
+      currentTarget={
+        trial:logs.length+1, angle:target.angle, height:target.height,
+        calibrationEyeHeightY:Number(eyeHeightY.toFixed(2)), calibrationEyeHeightYPercent:Number((eyeHeightY/getViewportHeight()).toFixed(4)),
+        calibrationLeftReachX:Number(leftReachX.toFixed(2)), calibrationLeftReachXPercent:Number((leftReachX/getViewportWidth()).toFixed(4)),
+        calibrationRightReachX:Number(rightReachX.toFixed(2)), calibrationRightReachXPercent:Number((rightReachX/getViewportWidth()).toFixed(4)),
+        calibratedLeftReachPx:Number((origin.x-leftReachX).toFixed(2)), calibratedRightReachPx:Number((rightReachX-origin.x).toFixed(2)),
+        x:Number(x.toFixed(2)), y:Number(y.toFixed(2)), targetSizePx:Number(targetRadiusPx.toFixed(2)),
+        shownAtISO:preserveShownTime&&prevISO?prevISO:new Date().toISOString(),
+        shownAtMs:preserveShownTime&&prevMs?prevMs:Date.now(),
+        homeVisible:showHome
       };
     }
 
-    function drawCurrent() {
-      if (isCalibrating) {
-        drawCalibrationScreen();
-        return;
-      }
-      if (finished) {
-        drawFinishedScreen();
-        return;
-      }
-      if (currentTarget) {
-        drawTarget(currentTarget);
-      } else if (targetsList.length > 0 && currentIndex < targetsList.length) {
-        drawTarget(targetsList[currentIndex]);
-      }
+    function drawCurrent(){
+      if(calibrationStage==='eye'){ drawEyeCalibrationScreen(); return; }
+      if(calibrationStage==='arms'){ drawArmCalibrationScreen(); return; }
+      if(finished){ drawFinishedScreen(); return; }
+      if(currentTarget) drawTarget(currentTarget,true);
+      else if(targetsList.length>0 && currentIndex<targetsList.length) drawTarget(targetsList[currentIndex]);
     }
 
-    function moveCalibrationLine(deltaY) {
-      if (!isCalibrating) return;
-      const h = getViewportHeight();
-      eyeHeightY = Math.min(Math.max(eyeHeightY + deltaY, h * 0.08), h * 0.9);
-      drawCalibrationScreen();
+    function moveEyeCalibrationLine(deltaY){
+      if(calibrationStage!=='eye') return;
+      const board=getBoardBase();
+      eyeHeightY=Math.min(Math.max(eyeHeightY+deltaY,board.y+30),board.y+board.height-30);
+      drawEyeCalibrationScreen();
     }
 
-    function startExperiment() {
-      if (!isCalibrating) return;
-      isCalibrating = false;
-      calibrationPanel.style.display = 'none';
-      logs = [];
-      currentTarget = null;
-      finished = false;
-      currentIndex = 0;
-      targetsList = generateTargets();
+    function beginArmCalibration(){
+      if(calibrationStage!=='eye') return;
+      calibrationStage='arms';
+      armCalibrationSide='right';
+      eyeCalibrationControls.style.display='none';
+      armCalibrationControls.style.display='block';
+      updateArmInstruction();
       updateMeta();
-      drawTarget(targetsList[currentIndex]);
+      drawArmCalibrationScreen();
     }
 
-    function nextTarget() {
-      if (isCalibrating) return;
-      if (finished) return;
+    function moveLeftReach(deltaX){
+      if(calibrationStage!=='arms') return;
+      leftReachX+=deltaX;
+      clampArmCalibration();
+      drawArmCalibrationScreen();
+    }
 
-      if (currentTarget) {
-        logs.push(currentTarget);
-        updateMeta();
+    function moveRightReach(deltaX){
+      if(calibrationStage!=='arms') return;
+      rightReachX+=deltaX;
+      clampArmCalibration();
+      drawArmCalibrationScreen();
+    }
+
+    function moveActiveArmBoundary(deltaX){
+      if(calibrationStage!=='arms') return;
+      if(armCalibrationSide==='right') moveRightReach(deltaX);
+      else moveLeftReach(deltaX);
+    }
+
+    function updateArmInstruction(){
+      const instruction=document.getElementById('armInstruction');
+      const confirmBtn=document.getElementById('confirmArmBtn');
+
+      if(armCalibrationSide==='right'){
+        instruction.textContent='קו פעיל: ימין. הזיזו אותו עם החצים ← → עד לקצה טווח ההגעה הנוח, ללא צעד הצידה. לחצו Enter לאישור ולעבור לקו השמאלי.';
+        confirmBtn.textContent='אישור ימין ומעבר לשמאל (Enter)';
+      } else {
+        instruction.textContent='קו פעיל: שמאל. הזיזו אותו עם החצים ← → עד לקצה טווח ההגעה הנוח, ללא צעד הצידה. לחצו Enter לאישור ולהתחלת הניסוי.';
+        confirmBtn.textContent='אישור שמאל והתחלת הניסוי (Enter)';
       }
+    }
 
-      if (logs.length >= TOTAL_TRIALS || currentIndex >= targetsList.length - 1) {
-        finished = true;
-        currentTarget = null;
-        drawFinishedScreen();
+    function confirmArmBoundary(){
+      if(calibrationStage!=='arms') return;
+
+      if(armCalibrationSide==='right'){
+        armCalibrationSide='left';
+        updateArmInstruction();
+        drawArmCalibrationScreen();
+      } else {
+        startExperiment();
+      }
+    }
+
+    function startExperiment(){
+      if(calibrationStage!=='arms') return;
+      calibrationStage='running'; calibrationPanel.style.display='none'; logs=[]; currentTarget=null; finished=false; currentIndex=0; targetsList=generateTargets(); updateMeta(); drawTarget(targetsList[currentIndex]);
+    }
+
+    function nextTarget(){
+      if(calibrationStage!=='running' || finished) return;
+      if(currentTarget){ logs.push(currentTarget); updateMeta(); }
+      if(logs.length>=TOTAL_TRIALS || currentIndex>=targetsList.length-1){ finished=true; currentTarget=null; drawFinishedScreen(); return; }
+      currentIndex+=1; drawTarget(targetsList[currentIndex]);
+    }
+
+    function downloadText(filename,text,type){ const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+    function exportJSON(){
+      const {origin}=getBoard();
+      const payload={
+        exportedAtISO:new Date().toISOString(),
+        calibrationEyeHeightY:Number(eyeHeightY.toFixed(2)), calibrationEyeHeightYPercent:Number((eyeHeightY/getViewportHeight()).toFixed(4)),
+        calibrationLeftReachX:Number(leftReachX.toFixed(2)), calibrationLeftReachXPercent:Number((leftReachX/getViewportWidth()).toFixed(4)),
+        calibrationRightReachX:Number(rightReachX.toFixed(2)), calibrationRightReachXPercent:Number((rightReachX/getViewportWidth()).toFixed(4)),
+        calibratedLeftReachPx:Number((origin.x-leftReachX).toFixed(2)), calibratedRightReachPx:Number((rightReachX-origin.x).toFixed(2)),
+        viewportWidth:Number(getViewportWidth().toFixed(2)), viewportHeight:Number(getViewportHeight().toFixed(2)),
+        trialCount:logs.length, totalTrialsConfigured:TOTAL_TRIALS, angles:ANGLES, angleTargetCounts:ANGLE_TARGET_COUNTS, heightTargetCounts:HEIGHT_TARGET_COUNTS, logs
+      };
+      downloadText('target_task_logs.json',JSON.stringify(payload,null,2),'application/json');
+    }
+
+    function exportCSV(){
+      const headers=['calibrationEyeHeightY','calibrationEyeHeightYPercent','calibrationLeftReachX','calibrationLeftReachXPercent','calibrationRightReachX','calibrationRightReachXPercent','calibratedLeftReachPx','calibratedRightReachPx','trial','angle','height','x','y','targetSizePx','shownAtISO','shownAtMs','homeVisible'];
+      const rows=logs.map(row=>headers.map(h=>row[h]));
+      const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+      downloadText('target_task_logs.csv',csv,'text/csv;charset=utf-8;');
+    }
+
+    function resetTask(){
+      calibrationStage='eye'; armCalibrationSide='right'; calibrationPanel.style.display='block'; eyeCalibrationControls.style.display='block'; armCalibrationControls.style.display='none';
+      logs=[]; currentTarget=null; finished=false; currentIndex=0; targetsList=[]; updateMeta(); drawEyeCalibrationScreen();
+    }
+
+    function roundRect(ctx,x,y,width,height,radius){ ctx.beginPath(); ctx.moveTo(x+radius,y); ctx.lineTo(x+width-radius,y); ctx.quadraticCurveTo(x+width,y,x+width,y+radius); ctx.lineTo(x+width,y+height-radius); ctx.quadraticCurveTo(x+width,y+height,x+width-radius,y+height); ctx.lineTo(x+radius,y+height); ctx.quadraticCurveTo(x,y+height,x,y+height-radius); ctx.lineTo(x,y+radius); ctx.quadraticCurveTo(x,y,x+radius,y); ctx.closePath(); }
+
+    toggleHomeBtn.addEventListener('click',()=>{ showHome=!showHome; toggleHomeBtn.textContent=showHome?'הסתר נקודת בית':'הצג נקודת בית'; drawCurrent(); });
+    document.getElementById('moveUpBtn').addEventListener('click',()=>moveEyeCalibrationLine(-calibrationStepPx));
+    document.getElementById('moveDownBtn').addEventListener('click',()=>moveEyeCalibrationLine(calibrationStepPx));
+    document.getElementById('toArmCalibrationBtn').addEventListener('click',beginArmCalibration);
+    document.getElementById('activeLeftBtn').addEventListener('click',()=>moveActiveArmBoundary(-armCalibrationStepPx));
+    document.getElementById('activeRightBtn').addEventListener('click',()=>moveActiveArmBoundary(armCalibrationStepPx));
+    document.getElementById('confirmArmBtn').addEventListener('click',confirmArmBoundary);
+    document.getElementById('nextBtn').addEventListener('click',nextTarget);
+    document.getElementById('jsonBtn').addEventListener('click',exportJSON);
+    document.getElementById('csvBtn').addEventListener('click',exportCSV);
+    document.getElementById('clearBtn').addEventListener('click',resetTask);
+    document.getElementById('recalibrateBtn').addEventListener('click',resetTask);
+
+    window.addEventListener('resize',resizeCanvas);
+    if(window.visualViewport){ window.visualViewport.addEventListener('resize',resizeCanvas); window.visualViewport.addEventListener('scroll',resizeCanvas); }
+
+    window.addEventListener('keydown',e=>{
+      if(toolbar.matches(':hover')) return;
+      if(calibrationStage==='eye'){
+        if(e.key==='ArrowUp'){ e.preventDefault(); moveEyeCalibrationLine(-calibrationStepPx); }
+        else if(e.key==='ArrowDown'){ e.preventDefault(); moveEyeCalibrationLine(calibrationStepPx); }
+        else if(e.key==='Enter' || e.key===' '){ e.preventDefault(); beginArmCalibration(); }
         return;
       }
-
-      currentIndex += 1;
-      drawTarget(targetsList[currentIndex]);
-    }
-
-    function downloadText(filename, text, type) {
-      const blob = new Blob([text], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    function getCalibrationSummary() {
-      return {
-        calibrationEyeHeightY: Number(eyeHeightY.toFixed(2)),
-        calibrationEyeHeightYPercent: Number((eyeHeightY / getViewportHeight()).toFixed(4)),
-        viewportWidth: Number(getViewportWidth().toFixed(2)),
-        viewportHeight: Number(getViewportHeight().toFixed(2)),
-        calibratedAtISO: null
-      };
-    }
-
-    function exportJSON() {
-      const payload = {
-        exportedAtISO: new Date().toISOString(),
-        calibrationEyeHeightY: Number(eyeHeightY.toFixed(2)),
-        calibrationEyeHeightYPercent: Number((eyeHeightY / getViewportHeight()).toFixed(4)),
-        viewportWidth: Number(getViewportWidth().toFixed(2)),
-        viewportHeight: Number(getViewportHeight().toFixed(2)),
-        trialCount: logs.length,
-        totalTrialsConfigured: TOTAL_TRIALS,
-        angles: ANGLES,
-        angleTargetCounts: ANGLE_TARGET_COUNTS,
-        heightTargetCounts: HEIGHT_TARGET_COUNTS,
-        logs
-      };
-      downloadText('target_task_logs.json', JSON.stringify(payload, null, 2), 'application/json');
-    }
-
-    function exportCSV() {
-      const headers = [
-        'calibrationEyeHeightY',
-        'calibrationEyeHeightYPercent',
-        'trial',
-        'angle',
-        'height',
-        'x',
-        'y',
-        'targetSizePx',
-        'shownAtISO',
-        'shownAtMs',
-        'homeVisible'
-      ];
-
-      const rows = logs.map(row => [
-        row.calibrationEyeHeightY,
-        row.calibrationEyeHeightYPercent,
-        row.trial,
-        row.angle,
-        row.height,
-        row.x,
-        row.y,
-        row.targetSizePx,
-        row.shownAtISO,
-        row.shownAtMs,
-        row.homeVisible
-      ]);
-
-      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      downloadText('target_task_logs.csv', csv, 'text/csv;charset=utf-8;');
-    }
-
-    function resetTask() {
-      isCalibrating = true;
-      calibrationPanel.style.display = 'block';
-      logs = [];
-      currentTarget = null;
-      finished = false;
-      currentIndex = 0;
-      targetsList = [];
-      updateMeta();
-      drawCalibrationScreen();
-    }
-
-    function roundRect(ctx, x, y, width, height, radius) {
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + width - radius, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-      ctx.lineTo(x + width, y + height - radius);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-      ctx.lineTo(x + radius, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.closePath();
-    }
-
-    toggleHomeBtn.addEventListener('click', () => {
-      showHome = !showHome;
-      toggleHomeBtn.textContent = showHome ? 'הסתר נקודת בית' : 'הצג נקודת בית';
-      drawCurrent();
-    });
-
-    document.getElementById('moveUpBtn').addEventListener('click', () => moveCalibrationLine(-calibrationStepPx));
-    document.getElementById('moveDownBtn').addEventListener('click', () => moveCalibrationLine(calibrationStepPx));
-    document.getElementById('startBtn').addEventListener('click', startExperiment);
-
-    document.getElementById('nextBtn').addEventListener('click', nextTarget);
-    document.getElementById('jsonBtn').addEventListener('click', exportJSON);
-    document.getElementById('csvBtn').addEventListener('click', exportCSV);
-    document.getElementById('clearBtn').addEventListener('click', resetTask);
-    document.getElementById('recalibrateBtn').addEventListener('click', resetTask);
-
-    window.addEventListener('resize', resizeCanvas);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', resizeCanvas);
-      window.visualViewport.addEventListener('scroll', resizeCanvas);
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if (toolbar.matches(':hover')) return;
-
-      if (isCalibrating) {
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          moveCalibrationLine(-calibrationStepPx);
-        } else if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          moveCalibrationLine(calibrationStepPx);
-        } else if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          startExperiment();
-        }
+      if(calibrationStage==='arms'){
+        if(e.key==='ArrowLeft'){ e.preventDefault(); moveActiveArmBoundary(-armCalibrationStepPx); }
+        else if(e.key==='ArrowRight'){ e.preventDefault(); moveActiveArmBoundary(armCalibrationStepPx); }
+        else if(e.key==='Enter' || e.key===' '){ e.preventDefault(); confirmArmBoundary(); }
         return;
       }
-
-      e.preventDefault();
-      nextTarget();
+      e.preventDefault(); nextTarget();
     });
 
-    canvas.addEventListener('pointerdown', () => {
-      if (!isCalibrating) nextTarget();
-    });
+    canvas.addEventListener('pointerdown',()=>{ if(calibrationStage==='running') nextTarget(); });
 
     updateMeta();
     resizeCanvas();
