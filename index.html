@@ -28,7 +28,7 @@
 <body>
   <div id="toolbarTrigger" class="toolbar-trigger"></div>
   <div id="toolbar" class="toolbar" aria-hidden="true">
-    <button id="nextBtn">מטרה הבאה</button>
+    <button id="nextBtn" disabled title="בזמן הניסוי עוברים למטרה הבאה רק באמצעות חץ שמאל/ימין">מעבר: ← שמאל / ימין →</button>
     <button id="toggleHomeBtn">הסתר נקודת בית</button>
     <button id="jsonBtn">ייצוא JSON</button>
     <button id="csvBtn">ייצוא CSV</button>
@@ -321,31 +321,75 @@
       calibrationStage='running'; calibrationPanel.style.display='none'; logs=[]; currentTarget=null; finished=false; currentIndex=0; targetsList=generateTargets(); updateMeta(); drawTarget(targetsList[currentIndex]);
     }
 
-    function nextTarget(){
+    function nextTarget(handUsed){
       if(calibrationStage!=='running' || finished) return;
-      if(currentTarget){ logs.push(currentTarget); updateMeta(); }
-      if(logs.length>=TOTAL_TRIALS || currentIndex>=targetsList.length-1){ finished=true; currentTarget=null; drawFinishedScreen(); return; }
-      currentIndex+=1; drawTarget(targetsList[currentIndex]);
+      if(handUsed!=='left' && handUsed!=='right') return;
+
+      if(currentTarget){
+        currentTarget.handUsed=handUsed;
+        logs.push(currentTarget);
+        updateMeta();
+      }
+
+      if(logs.length>=TOTAL_TRIALS || currentIndex>=targetsList.length-1){
+        finished=true;
+        currentTarget=null;
+        drawFinishedScreen();
+        return;
+      }
+
+      currentIndex+=1;
+      drawTarget(targetsList[currentIndex]);
     }
 
     function downloadText(filename,text,type){ const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
 
     function exportJSON(){
-      const {origin}=getBoard();
-      const payload={
-        exportedAtISO:new Date().toISOString(),
-        calibrationEyeHeightY:Number(eyeHeightY.toFixed(2)), calibrationEyeHeightYPercent:Number((eyeHeightY/getViewportHeight()).toFixed(4)),
-        calibrationLeftReachX:Number(leftReachX.toFixed(2)), calibrationLeftReachXPercent:Number((leftReachX/getViewportWidth()).toFixed(4)),
-        calibrationRightReachX:Number(rightReachX.toFixed(2)), calibrationRightReachXPercent:Number((rightReachX/getViewportWidth()).toFixed(4)),
-        calibratedLeftReachPx:Number((origin.x-leftReachX).toFixed(2)), calibratedRightReachPx:Number((rightReachX-origin.x).toFixed(2)),
-        viewportWidth:Number(getViewportWidth().toFixed(2)), viewportHeight:Number(getViewportHeight().toFixed(2)),
-        trialCount:logs.length, totalTrialsConfigured:TOTAL_TRIALS, angles:ANGLES, angleTargetCounts:ANGLE_TARGET_COUNTS, heightTargetCounts:HEIGHT_TARGET_COUNTS, logs
+      const {board,origin}=getBoard();
+      const session = {
+        exportedAtISO: new Date().toISOString(),
+        trialCount: logs.length,
+        totalTrialsConfigured: TOTAL_TRIALS,
+        viewportWidth: Number(getViewportWidth().toFixed(2)),
+        viewportHeight: Number(getViewportHeight().toFixed(2))
       };
-      downloadText('target_task_logs.json',JSON.stringify(payload,null,2),'application/json');
+
+      const calibration = {
+        eyeHeightY: Number(eyeHeightY.toFixed(2)),
+        eyeHeightYPercent: Number((eyeHeightY/getViewportHeight()).toFixed(4)),
+        leftReachX: Number(leftReachX.toFixed(2)),
+        leftReachXPercent: Number((leftReachX/getViewportWidth()).toFixed(4)),
+        rightReachX: Number(rightReachX.toFixed(2)),
+        rightReachXPercent: Number((rightReachX/getViewportWidth()).toFixed(4)),
+        leftReachPx: Number((origin.x-leftReachX).toFixed(2)),
+        rightReachPx: Number((rightReachX-origin.x).toFixed(2))
+      };
+
+      const taskConfiguration = {
+        angles: ANGLES,
+        angleTargetCounts: ANGLE_TARGET_COUNTS,
+        heightTargetCounts: HEIGHT_TARGET_COUNTS
+      };
+
+      const trials = logs.map(t => ({
+        trial: t.trial,
+        angle: t.angle,
+        height: t.height,
+        handUsed: t.handUsed,
+        x: t.x,
+        y: t.y,
+        targetSizePx: t.targetSizePx,
+        shownAtISO: t.shownAtISO,
+        shownAtMs: t.shownAtMs,
+        homeVisible: t.homeVisible
+      }));
+
+      const data = { session, calibration, taskConfiguration, trials };
+      downloadText('target_task_data.json', JSON.stringify(data,null,2),'application/json');
     }
 
     function exportCSV(){
-      const headers=['calibrationEyeHeightY','calibrationEyeHeightYPercent','calibrationLeftReachX','calibrationLeftReachXPercent','calibrationRightReachX','calibrationRightReachXPercent','calibratedLeftReachPx','calibratedRightReachPx','trial','angle','height','x','y','targetSizePx','shownAtISO','shownAtMs','homeVisible'];
+      const headers=['calibrationEyeHeightY','calibrationEyeHeightYPercent','calibrationLeftReachX','calibrationLeftReachXPercent','calibrationRightReachX','calibrationRightReachXPercent','calibratedLeftReachPx','calibratedRightReachPx','trial','angle','height','handUsed','x','y','targetSizePx','shownAtISO','shownAtMs','homeVisible'];
       const rows=logs.map(row=>headers.map(h=>row[h]));
       const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
       downloadText('target_task_logs.csv',csv,'text/csv;charset=utf-8;');
@@ -365,7 +409,7 @@
     document.getElementById('activeLeftBtn').addEventListener('click',()=>moveActiveArmBoundary(-armCalibrationStepPx));
     document.getElementById('activeRightBtn').addEventListener('click',()=>moveActiveArmBoundary(armCalibrationStepPx));
     document.getElementById('confirmArmBtn').addEventListener('click',confirmArmBoundary);
-    document.getElementById('nextBtn').addEventListener('click',nextTarget);
+    document.getElementById('nextBtn').addEventListener('click',()=>{});
     document.getElementById('jsonBtn').addEventListener('click',exportJSON);
     document.getElementById('csvBtn').addEventListener('click',exportCSV);
     document.getElementById('clearBtn').addEventListener('click',resetTask);
@@ -388,10 +432,21 @@
         else if(e.key==='Enter' || e.key===' '){ e.preventDefault(); confirmArmBoundary(); }
         return;
       }
-      e.preventDefault(); nextTarget();
+      if(calibrationStage==='running'){
+        if(e.key==='ArrowLeft'){
+          e.preventDefault();
+          nextTarget('left');
+        } else if(e.key==='ArrowRight'){
+          e.preventDefault();
+          nextTarget('right');
+        }
+        return;
+      }
     });
 
-    canvas.addEventListener('pointerdown',()=>{ if(calibrationStage==='running') nextTarget(); });
+    // During the experimental trials, pointer/touch does not advance.
+    // This prevents a trial from being saved without a handUsed value.
+    canvas.addEventListener('pointerdown',()=>{});
 
     updateMeta();
     resizeCanvas();
